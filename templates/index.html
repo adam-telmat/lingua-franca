@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lingua Franca - Text Translation Tool</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-language"></i> Lingua Franca</h1>
+            <p>Translate text between languages using Google Translate API</p>
+        </header>
+
+        <main class="translation-panel">
+            <div class="translation-column source">
+                <div class="language-selection">
+                    <select id="source-language">
+                        {% for code, language in languages.items() %}
+                            <option value="{{ code }}" {% if code == 'auto' %}selected{% endif %}>{{ language }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <textarea id="source-text" placeholder="Enter text to translate..."></textarea>
+                <div class="controls">
+                    <button id="clear-source" class="control-btn"><i class="fas fa-eraser"></i> Clear</button>
+                    <span id="source-char-count">0 characters</span>
+                </div>
+            </div>
+            
+            <div class="swap-languages">
+                <button id="swap-btn"><i class="fas fa-exchange-alt"></i></button>
+            </div>
+
+            <div class="translation-column target">
+                <div class="language-selection">
+                    <select id="target-language">
+                        {% for code, language in languages.items() %}
+                            {% if code != 'auto' %}
+                                <option value="{{ code }}" {% if code == 'en' %}selected{% endif %}>{{ language }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <textarea id="target-text" placeholder="Translation will appear here..." readonly></textarea>
+                <div class="controls">
+                    <button id="copy-target" class="control-btn"><i class="fas fa-copy"></i> Copy</button>
+                    <span id="target-char-count">0 characters</span>
+                </div>
+            </div>
+        </main>
+
+        <div class="translation-action">
+            <button id="translate-btn"><i class="fas fa-language"></i> Translate</button>
+        </div>
+
+        <div id="detected-language" class="detected-language hidden">
+            <p>Detected language: <span id="detected-language-name">Unknown</span></p>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 Lingua Franca | Powered by Google Translate</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html> 
