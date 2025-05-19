@@ -22,8 +22,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Update theme based on time of day
-    updateThemeBasedOnTime();
+    // Set up theme toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+        // Initialize theme from localStorage or time-based
+        initializeTheme();
+    } else {
+        // Just update based on time if no toggle exists
+        updateThemeBasedOnTime();
+    }
     
     // Initialize history panel if it exists
     if (document.getElementById('history-btn')) {
@@ -244,16 +252,65 @@ function formatTime(timestamp) {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
+// Initialize theme from localStorage or time
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        // Use saved theme preference
+        applyTheme(savedTheme);
+        updateThemeToggleIcon(savedTheme);
+    } else {
+        // Use automatic time-based theme
+        updateThemeBasedOnTime();
+    }
+}
+
+// Toggle between light and dark theme
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    // Save preference to localStorage
+    localStorage.setItem('theme', newTheme);
+    
+    // Apply the theme
+    applyTheme(newTheme);
+    
+    // Update icon
+    updateThemeToggleIcon(newTheme);
+}
+
+// Apply a specific theme
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    // Remove any forced theme based on time
+    document.documentElement.removeAttribute('data-forced-theme');
+}
+
+// Update theme toggle icon
+function updateThemeToggleIcon(theme) {
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        const icon = themeToggle.querySelector('span');
+        if (icon) {
+            icon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
+        }
+    }
+}
+
 // Update theme based on time of day
 function updateThemeBasedOnTime() {
     const hour = new Date().getHours();
     const isDarkMode = hour < 6 || hour >= 18; // Dark mode at night (6pm-6am)
     
-    // We can force dark mode if it's nighttime, otherwise rely on system preference
-    if (isDarkMode) {
-        document.documentElement.setAttribute('data-forced-theme', 'dark');
-    } else {
-        document.documentElement.removeAttribute('data-forced-theme');
+    // Only apply time-based theme if no manual preference exists
+    if (!localStorage.getItem('theme')) {
+        // We can force dark mode if it's nighttime, otherwise rely on system preference
+        if (isDarkMode) {
+            document.documentElement.setAttribute('data-forced-theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-forced-theme');
+        }
     }
 }
 
